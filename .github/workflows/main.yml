@@ -1,0 +1,29 @@
+name: build
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unzip project
+        run: |
+          mkdir project
+          unzip -q wayatt-crystal-pvp-project.zip -d project
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 9.2.1
+      - name: Build
+        working-directory: project
+        run: gradle build --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wayatt-crystal-pvp-jar
+          path: |
+            project/build/libs/*.jar
+            !project/build/libs/*-sources.jar
